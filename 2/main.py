@@ -87,7 +87,7 @@ spr, = ax.plot(X_SpiralSpr+X_Sh[0], Y_SpiralSpr+Y_Sh[0], color = 'green') # от
 pl1, = ax.plot([X_Sh[0]+R1-WIDE/2, X_Sh[0]+R1-WIDE/2+X_DSHT], [Y_Sh[0]+LEN, Y_Sh[0]+LEN+Y_DSHT], color = 'darkgreen') # штрихи на линии-закрепе спиральки
 pl2, = ax.plot([X_Sh[0]+R1, X_Sh[0]+R1+X_DSHT], [Y_Sh[0]+LEN, Y_Sh[0]+LEN+Y_DSHT], color = 'darkgreen')
 pl3, = ax.plot([X_Sh[0]+R1+WIDE/2, X_Sh[0]+R1+WIDE/2+X_DSHT], [Y_Sh[0]+LEN, Y_Sh[0]+LEN+Y_DSHT], color = 'darkgreen')
-hl, = ax.plot([X_Sh[0]+R1-WIDE/2, X_Sh[0]+R1-WIDE/2], [Y_Sh[0]+LEN, Y_Sh[0]+LEN], color = 'green') # отрисовка вертикальной линии от спиральки
+hl, = ax.plot([X_Sh[0]+R1-WIDE/2-0.05, X_Sh[0]+R1+WIDE/2+0.05], [Y_Sh[0]+LEN, Y_Sh[0]+LEN], color = 'green') # отрисовка вертикальной линии от спиральки
 upl, = ax.plot([X_Sh[0]+R1-0.0015, X_Sh[0]+R1-0.0015], [Y_Sh[0], Y_Sh[0]+LEN], color = 'green') # отрисовка линии-закрепа спирали
 sh, = ax.plot(X_Sh[0], Y_Sh[0], marker='o', markersize = 5, color = 'orange') # отрисовка шарнира
 st, = ax.plot([X_Sh[0], X_Gr[0]], [Y_Sh[0], Y_Gr[0]], color = 'orange') # отрисовка стержня
@@ -101,12 +101,12 @@ def anima(i): # функция анимации
     pl1.set_data([X_Sh[i]+R1-WIDE/2, X_Sh[i]+R1-WIDE/2+X_DSHT], [Y_Sh[i]+LEN, Y_Sh[i]+LEN+Y_DSHT])
     pl2.set_data([X_Sh[i]+R1, X_Sh[i]+R1+X_DSHT], [Y_Sh[i]+LEN, Y_Sh[i]+LEN+Y_DSHT])
     pl3.set_data([X_Sh[i]+R1+WIDE/2, X_Sh[i]+R1+WIDE/2+X_DSHT], [Y_Sh[i]+LEN, Y_Sh[i]+LEN+Y_DSHT])
-    hl.set_data([X_Sh[i]+R1-WIDE/2, X_Sh[i]+R1-WIDE/2], [Y_Sh[i]+LEN, Y_Sh[i]+LEN])
+    hl.set_data([X_Sh[i]+R1-WIDE/2-0.05, X_Sh[i]+R1+WIDE/2+0.05], [Y_Sh[i]+LEN, Y_Sh[i]+LEN])
     upl.set_data([X_Sh[i]+R1-0.0015, X_Sh[i]+R1-0.0015], [Y_Sh[i], Y_Sh[i]+LEN])
     sh.set_data(X_Sh[i], Y_Sh[i])
     st.set_data([X_Sh[i], X_Gr[i]], [Y_Sh[i], Y_Gr[i]])
     gr.set_data(X_Gr[i], Y_Gr[i])
-    return spr, pl1, pl2, pl3, hl, upl, sh, st, gr
+    return spr, hl, upl, sh, st, gr
 
 anim = FuncAnimation(fig, anima, frames=Steps, interval=50, repeat=False) # создаём разовую анимацию
 fig.suptitle('Kutsenko LW2', fontsize=14) # добавляем название
