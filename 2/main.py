@@ -1,5 +1,4 @@
 import numpy as np
-import sympy as sp
 import math
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, FFMpegWriter
@@ -46,8 +45,8 @@ X_Gr = np.zeros_like(t) # координаты груза
 Y_Gr = np.zeros_like(t)
 
 for i in np.arange(len(t)): # просчёт основных величин
-    phi[i] = 2*np.sin(1.7*t[i]) + 5*np.cos(1.2*t[i])
-    psi[i] = 2*np.sin(1.7*t[i]) + 5*np.cos(1.2*t[i])
+    phi[i] = 1.5*np.sin(1.7*t[i]) + 3.75*np.cos(1.2*t[i])
+    psi[i] = np.sin(1.7*t[i]) + 2.5*np.cos(1.2*t[i])
     X_Sh[i] = X_C + A*np.cos(phi[i]+math.pi/2)
     Y_Sh[i] = Y_C + A*np.sin(phi[i]+math.pi/2)
     X_Gr[i] = X_Sh[i] + L*np.cos(-psi[i]-math.pi/2)
@@ -58,7 +57,7 @@ for i in np.arange(len(t)): # просчёт основных величин
 fig = plt.figure() # задаём пространство для отрисовки
 ax = fig.add_subplot(1, 1, 1)
 ax.axis('equal')
-ax.set(xlim=[0, 10], ylim=[0, 10])
+ax.set(xlim = [0, 10], ylim = [0, 10])
 
 ### СТАТИЧЕСКАЯ ОТРИСОВКА
 
@@ -73,37 +72,37 @@ for i in np.arange(len(X_Lines_1)): # отрисовка штрихов на л�
 
 ### ДИНАМИЧЕСКАЯ ОТРИСОВКА
     
-Len = 0.4 # длина линии-закрепа пружинки
-Wide = 0.2 # ширина линии-закрепа пружинки
-X_Dsht = 0.1*np.cos(math.pi/4) # сдвиги штрихов по координатам
-Y_Dsht = 0.1*np.cos(math.pi/4)
+LEN = 0.4 # длина линии-закрепа пружинки
+WIDE = 0.2 # ширина линии-закрепа пружинки
+X_DSHT = 0.1*np.cos(math.pi/4) # сдвиги штрихов по координатам
+Y_DSHT = 0.1*np.cos(math.pi/4)
 R1 = 0.3 # радиусы спиральной пружины
 R2 = 0.1
 
-thetta = np.linspace(0, max(3/2*math.pi,3/2*math.pi+psi[0]), 100) # угол проворота спиральной пружины
+thetta = np.linspace(0, 3/2*math.pi+psi[0], 100) # угол проворота спиральной пружины
 X_SpiralSpr = (R1 + thetta*(R2-R1)/thetta[-1])*np.cos(thetta) # координаты точек спиральной пружины
 Y_SpiralSpr = -(R1 + thetta*(R2-R1)/thetta[-1])*np.sin(thetta)
 
 spr, = ax.plot(X_SpiralSpr+X_Sh[0], Y_SpiralSpr+Y_Sh[0], color = 'green') # отрисовка спиральной пружины
-pl1, = ax.plot([X_Sh[0]+R1-Wide/2, X_Sh[0]+R1-Wide/2+X_Dsht], [Y_Sh[0]+Len, Y_Sh[0]+Len+Y_Dsht], color = 'darkgreen') # штрихи на линии-закрепе спиральки
-pl2, = ax.plot([X_Sh[0]+R1, X_Sh[0]+R1+X_Dsht], [Y_Sh[0]+Len, Y_Sh[0]+Len+Y_Dsht], color = 'darkgreen')
-pl3, = ax.plot([X_Sh[0]+R1+Wide/2, X_Sh[0]+R1+Wide/2+X_Dsht], [Y_Sh[0]+Len, Y_Sh[0]+Len+Y_Dsht], color = 'darkgreen')
-hl, = ax.plot([X_Sh[0]+R1-Wide/2, X_Sh[0]+R1-Wide/2], [Y_Sh[0]+Len, Y_Sh[0]+Len]) # отрисовка вертикальной линии от спиральки
-upl, = ax.plot([X_Sh[0]+R1, X_Sh[0]+R1], [Y_Sh[0], Y_Sh[0]+Len], color = 'green') # отрисовка линии-закрепа спирали
+pl1, = ax.plot([X_Sh[0]+R1-WIDE/2, X_Sh[0]+R1-WIDE/2+X_DSHT], [Y_Sh[0]+LEN, Y_Sh[0]+LEN+Y_DSHT], color = 'darkgreen') # штрихи на линии-закрепе спиральки
+pl2, = ax.plot([X_Sh[0]+R1, X_Sh[0]+R1+X_DSHT], [Y_Sh[0]+LEN, Y_Sh[0]+LEN+Y_DSHT], color = 'darkgreen')
+pl3, = ax.plot([X_Sh[0]+R1+WIDE/2, X_Sh[0]+R1+WIDE/2+X_DSHT], [Y_Sh[0]+LEN, Y_Sh[0]+LEN+Y_DSHT], color = 'darkgreen')
+hl, = ax.plot([X_Sh[0]+R1-WIDE/2, X_Sh[0]+R1-WIDE/2], [Y_Sh[0]+LEN, Y_Sh[0]+LEN], color = 'green') # отрисовка вертикальной линии от спиральки
+upl, = ax.plot([X_Sh[0]+R1-0.0015, X_Sh[0]+R1-0.0015], [Y_Sh[0], Y_Sh[0]+LEN], color = 'green') # отрисовка линии-закрепа спирали
 sh, = ax.plot(X_Sh[0], Y_Sh[0], marker='o', markersize = 5, color = 'orange') # отрисовка шарнира
 st, = ax.plot([X_Sh[0], X_Gr[0]], [Y_Sh[0], Y_Gr[0]], color = 'orange') # отрисовка стержня
 gr, = ax.plot(X_Gr[0], Y_Gr[0], marker = 'o', markersize = 20, color = 'orange') # отрисовка грузика
 
-def anima(i):
-    thetta = np.linspace(0, max(3/2*math.pi,3/2*math.pi+psi[i]), 100)
+def anima(i): # функция анимации
+    thetta = np.linspace(0, 3/2*math.pi+psi[i], 100)
     X_SpiralSpr = (R1 + thetta*(R2-R1)/thetta[-1])*np.cos(thetta)
     Y_SpiralSpr = -(R1 + thetta*(R2-R1)/thetta[-1])*np.sin(thetta)
     spr.set_data(X_SpiralSpr+X_Sh[i], Y_SpiralSpr+Y_Sh[i])
-    pl1.set_data([X_Sh[i]+R1-Wide/2, X_Sh[i]+R1-Wide/2+X_Dsht], [Y_Sh[i]+Len, Y_Sh[i]+Len+Y_Dsht])
-    pl2.set_data([X_Sh[i]+R1, X_Sh[i]+R1+X_Dsht], [Y_Sh[i]+Len, Y_Sh[i]+Len+Y_Dsht])
-    pl3.set_data([X_Sh[i]+R1+Wide/2, X_Sh[i]+R1+Wide/2+X_Dsht], [Y_Sh[i]+Len, Y_Sh[i]+Len+Y_Dsht])
-    hl.set_data([X_Sh[i]+R1-Wide/2, X_Sh[i]+R1-Wide/2], [Y_Sh[i]+Len, Y_Sh[i]+Len])
-    upl.set_data([X_Sh[i]+R1, X_Sh[i]+R1], [Y_Sh[i], Y_Sh[i]+Len])
+    pl1.set_data([X_Sh[i]+R1-WIDE/2, X_Sh[i]+R1-WIDE/2+X_DSHT], [Y_Sh[i]+LEN, Y_Sh[i]+LEN+Y_DSHT])
+    pl2.set_data([X_Sh[i]+R1, X_Sh[i]+R1+X_DSHT], [Y_Sh[i]+LEN, Y_Sh[i]+LEN+Y_DSHT])
+    pl3.set_data([X_Sh[i]+R1+WIDE/2, X_Sh[i]+R1+WIDE/2+X_DSHT], [Y_Sh[i]+LEN, Y_Sh[i]+LEN+Y_DSHT])
+    hl.set_data([X_Sh[i]+R1-WIDE/2, X_Sh[i]+R1-WIDE/2], [Y_Sh[i]+LEN, Y_Sh[i]+LEN])
+    upl.set_data([X_Sh[i]+R1-0.0015, X_Sh[i]+R1-0.0015], [Y_Sh[i], Y_Sh[i]+LEN])
     sh.set_data(X_Sh[i], Y_Sh[i])
     st.set_data([X_Sh[i], X_Gr[i]], [Y_Sh[i], Y_Gr[i]])
     gr.set_data(X_Gr[i], Y_Gr[i])
