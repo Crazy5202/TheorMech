@@ -21,28 +21,29 @@ def odesys(y, t, r, a, l, m1, m2, c, g): # Функция создания си�
 
 ### ИЗМЕНЯЕМЫЕ ПАРАМЕТРЫ СИСТЕМЫ
 
-X_C = 5 # координаты центра диска
-Y_C = 5
-
-R = 1 # радиус диска
-A = 0.5 # расстояние между шарниром и центром диска
-L = 1 # длина стержня, на котором шарнирно прикреплён груз
-M1 = 1 # масса диска
-M2 = 1 # масса груза
-C = 1 # жёсткость спиральной пружины
+R = 10 # радиус диска
+A = 2 # расстояние между шарниром и центром диска
+L = 10 # длина стержня, на котором шарнирно прикреплён груз
+M1 = 10 # масса диска
+M2 = 10 # масса груза
+C = 200 # жёсткость спиральной пружины
 G = 9.81 # ускорение свободного падения
+
+K = 1 # величина для расчёта R (график)
 
 ### НАЧАЛЬНЫЕ ЗНАЧЕНИЯ
 
-PHI0 = math.pi/6
+PHI0 = math.pi
 PSI0 = 0
-DPHI0 = 0
-DPSI0 = 0
+DPHI0 = 5
+DPSI0 = 6
 Y0 = [PHI0, PSI0, DPHI0, DPSI0]
 
 ### СТАТИЧЕСКАЯ ЧАСТЬ
 
-RM = R/20
+X_C = R+A+L # координаты центра диска
+Y_C = R+A+L
+RM = R/20 # радиус маленького круга в центре диска
 
 ang = np.linspace(0, 2*math.pi, 80) # углы для отрисовки кругов
 X_Disk = X_C + R*np.cos(ang) # координаты диска
@@ -50,10 +51,10 @@ Y_Disk = Y_C + R*np.sin(ang)
 X_Sm = X_C + RM*np.cos(ang) # координаты маленького круга в центре диска
 Y_Sm = Y_C + RM*np.sin(ang)
 
-X_Side_1 = [X_C+RM*np.cos(math.pi*5/4), X_C+RM*2*np.cos(math.pi*5/4)] # боковые линии (центр)
-Y_Side_1 = [X_C+RM*np.sin(math.pi*5/4), Y_C+RM*2*np.sin(math.pi*5/4)]
-X_Side_2 = [X_C+RM*np.cos(math.pi/-4), X_C+RM*2*np.cos(math.pi/-4)]
-Y_Side_2 = [X_C+RM*np.sin(math.pi/-4), Y_C+RM*2*np.sin(math.pi/-4)]
+X_Side_1 = [X_C+RM*np.cos(math.pi*5/4), X_C+RM*3*np.cos(math.pi*5/4)] # боковые линии (центр)
+Y_Side_1 = [X_C+RM*np.sin(math.pi*5/4), Y_C+RM*3*np.sin(math.pi*5/4)]
+X_Side_2 = [X_C+RM*np.cos(math.pi/-4), X_C+RM*3*np.cos(math.pi/-4)]
+Y_Side_2 = [X_C+RM*np.sin(math.pi/-4), Y_C+RM*3*np.sin(math.pi/-4)]
 
 X_Bottom = [X_Side_1[1]-R/40, X_Side_2[1]+R/40] # линия-закреп центра
 Y_Bottom = [Y_Side_1[1], Y_Side_2[1]]
@@ -82,7 +83,7 @@ dpsi = Sol[:,3]
 ddphi = [odesys(y, t, R, A, L, M1, M2, C, G)[2] for y,t in zip(Sol,t)] # угловые ускорения
 ddpsi = [odesys(y, t, R, A, L, M1, M2, C, G)[3] for y,t in zip(Sol,t)]
 
-Nox = (M1+M2)*G-M2*( A*(ddphi*np.sin(phi)+dphi**2*np.cos(phi)) - L*(ddpsi*np.sin(psi)+dpsi**2*np.cos(psi)) ) # проекция реакции оси диска
+Rp = -K*dphi # сила сопротивления
 
 for i in np.arange(len(t)): # просчёт основных величин
     X_Sh[i] = X_C + A*np.cos(phi[i]+math.pi/2)
@@ -95,7 +96,7 @@ for i in np.arange(len(t)): # просчёт основных величин
 fig = plt.figure() # задаём пространство для отрисовки
 ax = fig.add_subplot(1, 1, 1)
 ax.axis('equal')
-ax.set(xlim = [X_C-R-A-L, X_C+R+A+L], ylim = [Y_C-R-A-L, Y_C+R+A+L])
+ax.set(xlim = [0, X_C+R+A+L], ylim = [0, Y_C+R+A+L])
 ax.set(xlabel="x", ylabel="y")
 
 ### СТАТИЧЕСКАЯ ОТРИСОВКА
@@ -145,24 +146,32 @@ def anima(i): # функция анимации
     sh.set_data(X_Sh[i], Y_Sh[i])
     st.set_data([X_Sh[i], X_Gr[i]], [Y_Sh[i], Y_Gr[i]])
     gr.set_data(X_Gr[i], Y_Gr[i])
-    return spr, hl, upl, sh, st, gr
+    return spr, pl1, pl2, pl3, hl, upl, sh, st, gr
 
 anim = FuncAnimation(fig, anima, frames=Steps, interval=40, repeat=False) # создаём разовую анимацию
 fig.suptitle('Kutsenko LW3', fontsize=14) # добавляем название
 anim.save("./Animation.mp4", writer="ffmpeg") # сохраняем анимацию
 
-plt.subplot(3, 1, 1) # строим графики величин
-plt.plot(t, phi)
+### ГРАФИКИ ЗАВИСИМОСТЕЙ ВЕЛИЧИН ОТ ВРЕМЕНИ
+
+pls = plt.figure()
+p1 = pls.add_subplot(3, 1, 1) # строим графики величин
+p1.set(xlim = [0,t_fin])
+p1.plot(t, phi)
+p1.grid()
 plt.title('Phi(t)')
 
-plt.subplot(3, 1, 2)
-plt.plot(t, psi)
+p2 = pls.add_subplot(3, 1, 2)
+p2.plot(t, psi)
+p2.grid()
+p2.set(xlim = [0,t_fin])
 plt.title('Psi(t)')
 
-plt.subplot(3, 1, 3)
-plt.plot(t, Nox)
-plt.title('Nox(t)')
+p3 = pls.add_subplot(3, 1, 3)
+p3.plot(t, Rp)
+p3.grid()
+p3.set(xlim = [0,t_fin])
+plt.title('R(t)')
 
 plt.tight_layout() # чтобы не накладывались названия
-
 plt.savefig('Plots.png') # сохраняем графики
